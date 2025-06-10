@@ -46,18 +46,17 @@ public class MySketch extends PApplet {
             
             Random random = new Random();
             int randomInt = random.nextInt(4);//random int between 0-3
-            if (randomInt > 2){
-            sun1.shootFire();
-            }
-            sun1.updateFire();
             
+            if (randomInt > 2){
+                sun1.shootFire();
+            }
+            
+            sun1.updateFire();
             sun2.draw();
             sun2.move(sun1.getSpeed(), 50);
-            
         }else{
             System.out.print("both are shot");
         }
-
         
         
         if (keyPressed) {//moving houYi
@@ -79,26 +78,46 @@ public class MySketch extends PApplet {
         houyi.draw();
         
         //FIRE COLLISION?
+        
+        // Fire collision with HouYi
+        Sun[] suns = {sun1, sun2};
+        
+        for (Sun sun : suns){
+            Fire fire = sun.getFire();
             
-    //method for houyi and fire collision
-                float houyiCenterX = houyi.getX() + houyi.getWidth()/2;
-        float houyiCenterY = houyi.getY() + houyi.getHeight()/2;
-        float sunCenterX = sun1.getX() + sun1.getDiameter()/2;
-        float sunCenterY = sun1.getY() + sun1.getDiameter()/2;
+            if (fire != null && fire.getIsActive()) {//not empty and true on active fire
+                int fireX = fire.getX();
+                int fireY = fire.getY();
 
-        float distance = dist(houyiCenterX, houyiCenterY, sunCenterX, sunCenterY);
+                float houyiX = houyi.getX();
+                float houyiY = houyi.getY();
+                float houyiW = houyi.getWidth();
+                float houyiH = houyi.getHeight();
 
-        if (distance < (sun1.getDiameter()/2 + houyi.getWidth()/2)) {
-            println("Collision with Sun!");
+                // Simple bounding box collision detection
+                if (fireX >= houyiX && fireX <= houyiX + houyiW &&
+                    fireY >= houyiY && fireY <= houyiY + houyiH) {
+                    houyi.hurt();
+                    println("Fire hit HouYi! Health: " + houyi.getHealth());
+                    sun1.getFire().deactivate();  // optional: stop the fire after hit
+                }
+                
+                if (houyi.getHealth() <= 0){
+                    print("Dead");
+                    
+                }
+            }
         }
-        
-        
+
         //annimating arrow
         if (isShooting){
             line(arrowX + 50,arrowY, arrowX+50, arrowY+20);//line piece
             arrowY -= arrowSpeed;//going up
         //arrow collision with sun?
             
+            float sunCenterX = sun1.getX() + sun1.getDiameter()/2;
+            float sunCenterY = sun1.getY() + sun1.getDiameter()/2;
+        
             float d = dist(arrowX, arrowY, sunCenterX, sunCenterY);
             
             if (d < sun1.getDiameter()){
@@ -109,6 +128,7 @@ public class MySketch extends PApplet {
         }//shooting arrow
     }
     
+    @Override
     public void keyPressed(){
         if (key == ' '){
             isShooting = true;
