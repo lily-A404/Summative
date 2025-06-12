@@ -12,14 +12,15 @@ import java.util.Random;
  */
 public class MySketch extends PApplet {
     private boolean gameOver = false;
+    private boolean stage1Cleared = false;
+    private int currentLevel = 0;
     
     private int speed = 5;
     private HouYi houyi;
     private Sun sun1, sun2, sun3, sun4, sun5, sun6, sun7, sun8, sun9;
     private int sunSpeed = 5;
     private int sunDiameter1 = 70;
-    private boolean stage1Cleared = false;
-
+    Sun [][] sunWaves = new Sun[3][3];
     
     private PImage backgroundImg;
     private PImage deathScreen;
@@ -43,6 +44,23 @@ public class MySketch extends PApplet {
         sun1 = new Sun (this, 100,30,sunSpeed+5, sunDiameter1);
         sun2 = new Sun (this, 700,30, sunSpeed+2, sunDiameter1);
         sun3 = new Sun(this, 300, 30, sunSpeed, sunDiameter1*2);
+        
+        sun4 = new Sun (this, 700,30, sunSpeed+2, 80);
+        sun5 = new Sun(this, 300, 30, sunSpeed, sunDiameter1);
+        sun6 = new Sun (this, 200,30, sunSpeed+2, 50);
+        
+        sun7 = new Sun(this, 100, 30, sunSpeed, 30);
+        sun8 = new Sun(this, 300, 30, sunSpeed, 50);
+        sun9 = new Sun (this, 700,30, sunSpeed+2, 20);
+        sunWaves [0][0] = sun1;
+        sunWaves [0][1] = sun2;
+        sunWaves [0][2] = sun3;
+        sunWaves [1][0] = sun4;
+        sunWaves [1][1] = sun5;
+        sunWaves [1][2] = sun6;
+        sunWaves [2][0] = sun7;
+        sunWaves [2][1] = sun8;
+        sunWaves [2][2] = sun9;
     }
     
     public void draw(){
@@ -61,9 +79,8 @@ public class MySketch extends PApplet {
         
         
         
-        for (int row = 0; row < suns.length; row++) {
-    for (int col = 0; col < suns[row].length; col++) {
-        Sun sun = suns[row][col];
+        for (int i = 0; i < 3; i++){
+        Sun sun = sunWaves[currentLevel][i];
         if (sun != null) {  // always a good idea to null-check
             //drawing, moving and, firing suns
             if (!sun.getIsShot()) {
@@ -123,18 +140,23 @@ public class MySketch extends PApplet {
                     }//if fire is active and not null
             }//if sun isn't shot
         }//if sun is not null
-    }//columnfor loop
-        }//row for loop
-
-        if (!stage1Cleared && sun1.getIsShot() &&sun2.getIsShot()&&sun3.getIsShot()){
-            System.out.println("3/9 suns down!");
-            stage1Cleared = true;
-        }
+        }//for loop
         
-        if (stage1Cleared){
-            sun4 = new Sun (this, 100,30,sunSpeed+5, sunDiameter1);
-            sun5 = new Sun (this, 700,30, sunSpeed+2, sunDiameter1);
-            sun6 = new Sun(this, 300, 30, sunSpeed, sunDiameter1*2);
+        //after loop/after three suns have been defeated
+        
+        
+        boolean levelCleared = true;
+
+        for (int i = 0; i < 3; i++) {
+            if (!sunWaves[currentLevel][i].getIsShot()) {
+                levelCleared = false;
+                break;
+            }
+        }
+
+        if (levelCleared && currentLevel < 2) {
+            currentLevel++; // move to next batch
+            println("Level up! Now showing batch " + (currentLevel + 1));
         }
         
         if (keyPressed) {//moving houYi
@@ -169,14 +191,43 @@ public void keyPressed() {
         PApplet.main("summative.MySketch");
     }
     
-        public void resetGame() {
-        // reset key game state
+        public void resetGame() {//after game over, reset game meth is called
         houyi = new HouYi(this, 0, 369, speed, "images/houyi.png");
+        
+        //receate all sun enemies
+        //--------------------------------------------->sun copy pasting
         sun1 = new Sun (this, 100,30,sunSpeed+5, sunDiameter1);
         sun2 = new Sun (this, 700,30, sunSpeed+2, sunDiameter1);
         sun3 = new Sun(this, 300, 30, sunSpeed, sunDiameter1*2);
-        isShooting = false;
-        arrowX = arrowY = 0;
-        gameOver = false;
+        
+        sun4 = new Sun (this, 700,30, sunSpeed+2, 80);
+        sun5 = new Sun(this, 300, 30, sunSpeed, sunDiameter1);
+        sun6 = new Sun (this, 200,30, sunSpeed+2, 50);
+        
+        sun7 = new Sun(this, 100, 30, sunSpeed, 30);
+        sun8 = new Sun(this, 300, 30, sunSpeed, 50);
+        sun9 = new Sun (this, 700,30, sunSpeed+2, 20);
+        
+        
+         // Reset sun wave batches
+    sunWaves = new Sun[3][3];
+    sunWaves[0][0] = sun1;
+    sunWaves[0][1] = sun2;
+    sunWaves[0][2] = sun3;
+
+    sunWaves[1][0] = sun4;
+    sunWaves[1][1] = sun5;
+    sunWaves[1][2] = sun6;
+
+    sunWaves[2][0] = sun7;
+    sunWaves[2][1] = sun8;
+    sunWaves[2][2] = sun9;
+    //--------------------------------------------->wave copy pasting
+    
+     // Reset state variables
+    currentLevel = 0;
+    isShooting = false;
+    arrowX = arrowY = 0;
+    gameOver = false;
     }
 }
